@@ -1,25 +1,24 @@
 from flask import Flask, render_template_string, request, send_from_directory, redirect, session
 import mysql.connector
 import os
-import webbrowser
 
 app = Flask(__name__)
-app.secret_key = "clave_2026"
+app.secret_key = os.environ.get("SECRET_KEY", "clave_2026")
 
 # =========================
 # LOGIN CONFIG
 # =========================
-USER = "admin"
-PASS = "1234"
+USER = os.environ.get("APP_USER", "admin")
+PASS = os.environ.get("APP_PASS", "1234")
 
 # =========================
-# CONFIG DB
+# CONFIG DB (ENV VARIABLES)
 # =========================
 db_config = {
-    "host": "localhost",
-    "user": "backup",
-    "password": "123456",
-    "database": "vigilancia",
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "user": os.environ.get("DB_USER", "backup"),
+    "password": os.environ.get("DB_PASS", "123456"),
+    "database": os.environ.get("DB_NAME", "vigilancia"),
     "connection_timeout": 5,
     "autocommit": True
 }
@@ -30,7 +29,7 @@ def get_conn():
 # =========================
 # CARPETAS
 # =========================
-BASE = os.path.join(os.path.expanduser("~"), "Desktop", "RegistroVideovigilancia")
+BASE = os.path.join(os.getcwd(), "storage")
 
 CARPETAS = {
     "puerta de ingreso": BASE,
@@ -100,7 +99,7 @@ img{width:100%;border-radius:12px;cursor:pointer}
 <body>
 
 <header>
-<h1> PANEL CCTV SATELITAL </h1>
+<h1>PANEL CCTV</h1>
 <div>
 <form action="/stats" style="display:inline">
 <button class="btn stats">Estadísticas</button>
@@ -180,7 +179,6 @@ def login():
 # =========================
 @app.route("/panel")
 def panel():
-
     if not session.get("login"):
         return redirect("/")
 
@@ -223,11 +221,10 @@ def panel():
 
 
 # =========================
-# ESTADISTICAS
+# STATS
 # =========================
 @app.route("/stats")
 def stats():
-
     if not session.get("login"):
         return redirect("/")
 
@@ -266,13 +263,11 @@ def stats():
     </div>
     """
 
-
 # =========================
 # IMAGEN SEGURA
 # =========================
 @app.route("/img/<nombre>")
 def img(nombre):
-
     if not session.get("login"):
         return redirect("/")
 
@@ -300,8 +295,8 @@ def logout():
 
 
 # =========================
-# START
+# START (IMPORTANTE PARA RENDER)
 # =========================
-if __name__=="__main__":
-    webbrowser.open("http://127.0.0.1:5000")
-    app.run(threaded=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
