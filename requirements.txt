@@ -1,6 +1,6 @@
-flask
-opencv-python
-easyocr
-numpy
-pandas
-mysql-connector-python
+flask 
+opencv-python 
+easyocr 
+numpy 
+pandas 
+mysql-connector-python 
